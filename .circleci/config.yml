@@ -4,6 +4,11 @@ jobs:
     working_directory: ~/code
     docker:
       - image: circleci/android:api-25-alpha
+       - run:
+          name: Build debug APK and release APK
+          command: |
+            ./gradlew :app:assembleDebug
+            ./gradlew :app:assembleDebugAndroidTest
     environment:
       JVM_OPTS: -Xmx3200m
     steps:
