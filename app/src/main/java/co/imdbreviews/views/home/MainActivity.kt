@@ -18,6 +18,7 @@ import co.imdbreviews.rest.ApiClient
 import co.imdbreviews.rest.ApiInterface
 import co.imdbreviews.utils.ListDecorations
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
@@ -38,7 +39,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setSupportActionBar(toolbar)
 
         fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+            Snackbar.make(view, "Replace with your own action", BaseTransientBottomBar.LENGTH_LONG)
                     .setAction("Action", null).show()
         }
 

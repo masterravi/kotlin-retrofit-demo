@@ -4,6 +4,7 @@ import android.os.Bundle
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity;
 import co.imdbreviews.R
+import com.google.android.material.snackbar.BaseTransientBottomBar
 
 import kotlinx.android.synthetic.main.activity_splash.*
 
@@ -15,7 +16,7 @@ class SplashActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+            Snackbar.make(view, "Replace with your own action", BaseTransientBottomBar.LENGTH_LONG)
                     .setAction("Action", null).show()
         }
     }
