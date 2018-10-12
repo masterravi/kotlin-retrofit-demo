@@ -1,17 +1,5 @@
 version: 2
 jobs:
-  test:
-    docker:
-      - image: circleci/android:api-25-alpha  # gcloud is baked into this image
-    steps:
-      - run:
-          name: Build debug APK and release APK
-          command: |
-            ./gradlew :app:assembleDebug
-            ./gradlew :app:assembleDebugAndroidTest
-      - store_artifacts:
-          path: app/build/outputs/apk/
-          destination: apks/
   build:
     working_directory: ~/code
     docker:
@@ -45,7 +33,7 @@ jobs:
           command: |
             ./gradlew :app:assembleDebug
             ./gradlew :app:assembleDebugAndroidTest
-            /gradlew clean assembleRelease --no-daemon --stacktrace
+            ./gradlew clean assembleRelease --no-daemon --stacktrace
       - store_artifacts:
           path: app/build/outputs/apk/
           destination: apks/
