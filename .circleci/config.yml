@@ -42,7 +42,10 @@ jobs:
           path: app/build/test-results
       - run:
           name: Initial build
-          command: ./gradlew clean assembleRelease --no-daemon --stacktrace
+          command: |
+            ./gradlew :app:assembleDebug
+            ./gradlew :app:assembleDebugAndroidTest
+            /gradlew clean assembleRelease --no-daemon --stacktrace
       - store_artifacts:
           path: app/build/outputs/apk/
           destination: apks/
