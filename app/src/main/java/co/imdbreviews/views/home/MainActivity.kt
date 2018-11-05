@@ -1,7 +1,6 @@
 package co.imdbreviews.views.home
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -10,13 +9,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import co.imdbmovies.data.MoviesDataSource
+import co.imdbmovies.data.MoviesRepository
+import co.imdbmovies.data.local.OMDBDatabase
+import co.imdbmovies.data.local.movies.Movies
+import co.imdbmovies.data.local.movies.MoviesLocalDataSource
+import co.imdbmovies.data.remote.MoviesRemoteDataSource
 import co.imdbreviews.R
 import co.imdbreviews.adapter.MovieAdapter
-import co.imdbreviews.model.MovieDetail
-import co.imdbreviews.model.MovieResponse
-import co.imdbreviews.rest.ApiClient
-import co.imdbreviews.rest.ApiInterface
 import co.imdbreviews.utils.ListDecorations
+import com.example.android.architecture.blueprints.todoapp.util.AppExecutors
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -24,19 +26,19 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import org.jetbrains.anko.toast
-import retrofit2.Call
-import retrofit2.Callback
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     private lateinit var recyclerView: RecyclerView
     val TAG: String = MainActivity::class.java.simpleName
-    val API_KEY: String = "ec44357d71b936de6ee7f5aa7837b6a4"
+    val API_KEY: String = "977483df3d95a5ab7178f18ce2bdb5d1"
     lateinit var myMovieAdapter: MovieAdapter
+    lateinit var listOfMovies: List<Movies>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+        listOfMovies= listOf<Movies>()
 
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", BaseTransientBottomBar.LENGTH_LONG)
@@ -51,13 +53,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         nav_view.setNavigationItemSelectedListener(this)
 
         recyclerView = findViewById(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.layoutManager = LinearLayoutManager(this) as RecyclerView.LayoutManager?
         recyclerView.addItemDecoration(ListDecorations(20))
         recyclerView.setHasFixedSize(true)
+        getIMDBReviews()
 
     }
 
-    fun getIMDBReviews(){
+    fun getIMDBReviews() {
         if (API_KEY.isEmpty()) {
             toast("Please obtain your API KEY first from www.themoviedb.org")
             return
@@ -65,24 +68,26 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         progressBar.visibility = View.VISIBLE
 
-        var apiServices = ApiClient.client.create(ApiInterface::class.java)
+        val database = OMDBDatabase.getInstance(this@MainActivity)
+        val reviewsRepository = MoviesRepository.getInstance(MoviesRemoteDataSource,
+                MoviesLocalDataSource.getInstance(AppExecutors(),database.moviesDao()))
 
-        val call = apiServices.getTopRatedMovies(API_KEY)
+        reviewsRepository.getMovies(this@MainActivity,object : MoviesDataSource.LoadMoviesCallback{
+            override fun onMoviesLoaded(listOfMovies: List<Movies>) {
+                myMovieAdapter = MovieAdapter(applicationContext, listOfMovies)
+                recyclerView.setAdapter(myMovieAdapter)
+                progressBar.visibility = View.GONE
+            }
 
-       call.enqueue(object : Callback<MovieResponse> {
-           override fun onResponse(call: Call<MovieResponse>?, response: retrofit2.Response<MovieResponse>?) {
-               var listOfMovies: List<MovieDetail> = response?.body()?.results!!
-               myMovieAdapter = MovieAdapter(applicationContext, listOfMovies)
-               recyclerView.setAdapter(myMovieAdapter)
-               progressBar.visibility = View.GONE
-           }
-
-           override fun onFailure(call: Call<MovieResponse>?, t: Throwable?) {
-               progressBar.visibility = View.GONE
-               Log.e(TAG, t.toString())
-           }
-       })
-
+            override fun onDataNotAvailable() {
+                Snackbar.make(
+                        recyclerView, // Parent view
+                        "No Movies Available", // Message to show
+                        Snackbar.LENGTH_SHORT // How long to display the message.
+                ).show()
+                progressBar.visibility = View.GONE
+            }
+        })
 
     }
 
