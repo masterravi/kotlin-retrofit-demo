@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 Snackbar.make(
                         recyclerView, // Parent view
                         "No Movies Available", // Message to show
-                        Snackbar.LENGTH_SHORT // How long to display the message.
+                        BaseTransientBottomBar.LENGTH_SHORT // How long to display the message.
                 ).show()
                 progressBar.visibility = View.GONE
             }
