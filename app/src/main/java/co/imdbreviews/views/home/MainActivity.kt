@@ -33,11 +33,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     val API_KEY: String = "977483df3d95a5ab7178f18ce2bdb5d1"
     lateinit var myMovieAdapter: MovieAdapter
     lateinit var listOfMovies: List<Movies>
+    var b : Bundle? = intent.extras
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
+        b= intent.extras
         listOfMovies= listOf<Movies>()
 
         fab.setOnClickListener { view ->

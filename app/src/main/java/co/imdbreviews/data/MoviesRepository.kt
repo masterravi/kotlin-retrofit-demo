@@ -44,7 +44,6 @@ class MoviesRepository(
 
         }
 
-
     }
 
     private fun getTasksFromRemoteDataSource(context:Context,callback: MoviesDataSource.LoadMoviesCallback) {
